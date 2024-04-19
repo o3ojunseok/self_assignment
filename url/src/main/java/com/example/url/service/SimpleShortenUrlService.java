@@ -1,5 +1,7 @@
 package com.example.url.service;
 
+import com.example.url.common.LackOfShortenUrlKeyException;
+import com.example.url.common.NotFoundShortedUrlException;
 import com.example.url.domain.ShortenUrl;
 import com.example.url.dto.ShortenUrlCreateRequestDto;
 import com.example.url.dto.ShortenUrlCreateResponseDto;
@@ -20,7 +22,21 @@ public class SimpleShortenUrlService {
             ShortenUrlCreateRequestDto shortenUrlCreateRequestDto
     ) {
         String originalUrl = shortenUrlCreateRequestDto.getOriginalUrl();
-        String shortenUrlKey = ShortenUrl.generateShortenUrlKey();
+        String shortenUrlKey = "";
+
+        final int MAX_RETRY_COUNT = 5;
+        int count = 0;
+
+        while(count++ < MAX_RETRY_COUNT) {
+            shortenUrlKey = ShortenUrl.generateShortenUrlKey();
+            ShortenUrl shortenUrl = shortenUrlRepository.findShortenUrlByShortenUrlKey(shortenUrlKey);
+
+            if (shortenUrl == null)
+                break;
+        }
+
+        if (count > MAX_RETRY_COUNT)
+            throw new LackOfShortenUrlKeyException();
 
         ShortenUrl shortenUrl = new ShortenUrl(originalUrl, shortenUrlKey);
         shortenUrlRepository.saveShortenUrl(shortenUrl);
@@ -32,7 +48,7 @@ public class SimpleShortenUrlService {
     public ShortenUrlInformationDto getShortenUrlInformationByShortenUrlKey(String shortenUrlKey) {
         ShortenUrl shortenUrl = shortenUrlRepository.findShortenUrlByShortenUrlKey(shortenUrlKey);
         if (shortenUrl == null) {
-            throw new NotFoundShortenUrlException();
+            throw new NotFoundShortedUrlException();
         }
         ShortenUrlInformationDto shortenUrlInformationDto = new ShortenUrlInformationDto(shortenUrl);
         return shortenUrlInformationDto;
@@ -42,7 +58,7 @@ public class SimpleShortenUrlService {
         ShortenUrl shortenUrl = shortenUrlRepository.findShortenUrlByShortenUrlKey(shortenUrlKey);
 
         if (shortenUrl == null) {
-            throw new NotFoundShortenUrlException();
+            throw new NotFoundShortedUrlException();
         }
 
         shortenUrl.increaseRedirectCount();
