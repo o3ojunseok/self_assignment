@@ -14,4 +14,11 @@ public class GlobalExceptionHandler {
     ) {
         return new ResponseEntity<>("단축 url 찾지 못함", HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(LackOfShortenUrlKeyException.class)
+    public ResponseEntity<String> handleLackOfShortenUrlKeyException(
+            LackOfShortenUrlKeyException ex
+    ) {
+        return new ResponseEntity<>("url 부족", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

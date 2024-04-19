@@ -18,25 +18,25 @@ public class SimpleShortenUrlService {
     SimpleShortenUrlService(ShortenUrlRepository shortenUrlRepository) {
         this.shortenUrlRepository = shortenUrlRepository;
     }
-    public ShortenUrlCreateResponseDto generateShortenUrl(
-            ShortenUrlCreateRequestDto shortenUrlCreateRequestDto
-    ) {
-        String originalUrl = shortenUrlCreateRequestDto.getOriginalUrl();
-        String shortenUrlKey = "";
 
+    private String getUniqueShortenUrlKey() {
         final int MAX_RETRY_COUNT = 5;
         int count = 0;
 
-        while(count++ < MAX_RETRY_COUNT) {
-            shortenUrlKey = ShortenUrl.generateShortenUrlKey();
+        while (count++ < MAX_RETRY_COUNT) {
+            String shortenUrlKey = ShortenUrl.generateShortenUrlKey();
             ShortenUrl shortenUrl = shortenUrlRepository.findShortenUrlByShortenUrlKey(shortenUrlKey);
 
             if (shortenUrl == null)
                 break;
         }
-
-        if (count > MAX_RETRY_COUNT)
-            throw new LackOfShortenUrlKeyException();
+        throw new LackOfShortenUrlKeyException();
+    }
+    public ShortenUrlCreateResponseDto generateShortenUrl(
+            ShortenUrlCreateRequestDto shortenUrlCreateRequestDto
+    ) {
+        String originalUrl = shortenUrlCreateRequestDto.getOriginalUrl();
+        String shortenUrlKey = getUniqueShortenUrlKey();
 
         ShortenUrl shortenUrl = new ShortenUrl(originalUrl, shortenUrlKey);
         shortenUrlRepository.saveShortenUrl(shortenUrl);
