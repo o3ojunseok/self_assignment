@@ -1,7 +1,9 @@
 package com.example.url.service;
 
+import com.example.url.domain.ShortenUrl;
 import com.example.url.dto.ShortenUrlCreateRequestDto;
 import com.example.url.dto.ShortenUrlCreateResponseDto;
+import com.example.url.dto.ShortenUrlInformationDto;
 import com.example.url.repository.ShortenUrlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,19 @@ public class SimpleShortenUrlService {
     public ShortenUrlCreateResponseDto generateShortenUrl(
             ShortenUrlCreateRequestDto shortenUrlCreateRequestDto
     ) {
-        return null;
+        String originalUrl = shortenUrlCreateRequestDto.getOriginalUrl();
+        String shortenUrlKey = ShortenUrl.generateShortenUrlKey();
+
+        ShortenUrl shortenUrl = new ShortenUrl(originalUrl, shortenUrlKey);
+        shortenUrlRepository.saveShortenUrl(shortenUrl);
+
+        ShortenUrlCreateResponseDto shortenUrlCreateResponseDto = new ShortenUrlCreateResponseDto(shortenUrl);
+        return shortenUrlCreateResponseDto;
+    }
+
+    public ShortenUrlInformationDto getShortenUrlInformationByShortenUrlKey(String shortenUrlKey) {
+        ShortenUrl shortenUrl = shortenUrlRepository.findShortenUrlByShortenUrlKey(shortenUrlKey);
+        ShortenUrlInformationDto shortenUrlInformationDto = new ShortenUrlInformationDto(shortenUrl);
+        return shortenUrlInformationDto;
     }
 }
