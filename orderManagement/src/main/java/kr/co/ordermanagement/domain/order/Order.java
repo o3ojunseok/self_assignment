@@ -10,11 +10,10 @@ public class Order {
     private Integer totalPrice;
     private String state;
 
-    public Order(Long id, List<Product> orderedProducts, Integer totalPrice, String state) {
-        this.id = id;
+    public Order(List<Product> orderedProducts) {
         this.orderedProducts = orderedProducts;
-        this.totalPrice = totalPrice;
-        this.state = state;
+        this.totalPrice = calculateTotalPrice(orderedProducts);
+        this.state = "CREATED";
     }
 
     public Long getId() {
@@ -48,7 +47,7 @@ public class Order {
                 .mapToInt(orderedProduct -> orderedProduct.getPrice() + orderedProduct.getAmount())
                 .sum();
     }
-    
+
     public void changeStateForce(String state) {
         this.state = state;
     }

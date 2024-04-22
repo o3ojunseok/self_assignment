@@ -25,8 +25,8 @@ public class SimpleOrderService {
     }
 
     public OrderResponseDto createOrder(List<OrderProductRequestDto> orderProductRequestDtoList) {
-        List<Product> orderProducts = makeOrderedProducts(orderProductRequestDtoList);
-        decreaseProductsAmount(orderedProducts);
+        List<Product> orderProducts = makeOrderProducts(orderProductRequestDtoList);
+        decreaseProductsAmount(orderProducts);
 
         Order order = new Order(orderProducts);
         orderRepository.add(order);
