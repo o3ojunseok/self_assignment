@@ -54,4 +54,9 @@ public class Order {
     public Boolean sameState(String state) {
         return this.state.equals(state);
     }
+    public void cancel() {
+        if (!this.state.equals("CREATED"))
+            throw new RuntimeException("이미 취소 혹은 취소 불가");
+        this.state = "CANCELED";
+    }
 }
