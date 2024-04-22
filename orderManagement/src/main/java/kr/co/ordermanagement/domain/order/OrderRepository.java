@@ -7,5 +7,5 @@ public interface OrderRepository {
 
     Order findById(Long id);
 
-    List<Order> findByState(String state);
+    List<Order> findByState(State state);
 }
