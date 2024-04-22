@@ -5,9 +5,7 @@ import kr.co.ordermanagement.presentation.dto.OrderProductRequestDto;
 import kr.co.ordermanagement.presentation.dto.OrderResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,4 +23,10 @@ public class OrderController {
         OrderResponseDto orderResponseDto = simpleOrderService.createOrder(orderProductRequestDtoList);
         return ResponseEntity.ok(orderResponseDto);
     }
+
+    @GetMapping("/orders/{orderId}")
+        public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long orderId) {
+            OrderResponseDto orderResponseDto = simpleOrderService.findById(orderId);
+            return ResponseEntity.ok(orderResponseDto);
+        }
 }

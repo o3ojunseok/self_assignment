@@ -35,7 +35,7 @@ public class SimpleOrderService {
     }
 
     private List<Product> makeOrderProducts(List<OrderProductRequestDto> orderProductRequestDtoList) {
-        return; orderProductRequestDtoList
+        return orderProductRequestDtoList
                 .stream()
                 .map(orderProductRequestDto -> {
                     Long productId = orderProductRequestDto.getId();
@@ -64,5 +64,11 @@ public class SimpleOrderService {
 
                     productRepository.update(product);
                 });
+    }
+
+    public OrderResponseDto findById(Long orderId) {
+        Order order = orderRepository.findById(orderId);
+        OrderResponseDto orderResponseDto = OrderResponseDto.toDto(order);
+        return orderResponseDto;
     }
 }
