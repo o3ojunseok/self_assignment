@@ -36,7 +36,20 @@ public class OrderController {
             @PathVariable Long orderId,
             @RequestBody ChangeStateRequestDto changeStateRequestDto
     ) {
-        OrderResponseDto orderResponseDto = simpleOrderService.changeState(orderId, changeStateRequestDto);
-        return ResponseEntity.ok(orderResponseDto);
+        if (changeStateRequestDto.getState().equals("CREATED") ||
+        changeStateRequestDto.getState().equals("SHIPPING") ||
+        changeStateRequestDto.getState().equals("COMPLETED") ||
+        changeStateRequestDto.getState().equals("CANCELED")) {
+            OrderResponseDto orderResponseDto = simpleOrderService.changeState(orderId, changeStateRequestDto);
+            return ResponseEntity.ok(orderResponseDto);
+        } else {
+            throw new RuntimeException("존재하지 않는 상태");
+        }
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<List<OrderResponseDto>> getOrdersByState(@RequestParam String state) {
+        List<OrderResponseDto> orderResponseDtos = simpleOrderService.findByState(state);
+        return ResponseEntity.ok(orderResponseDtos);
     }
 }
