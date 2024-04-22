@@ -49,7 +49,7 @@ public class SimpleOrderService {
                             productId,
                             product.getName(),
                             product.getPrice(),
-                            orderProductRequestDto.getAmount(),
+                            orderProductRequestDto.getAmount()
                     );
                 }).toList();
     }
@@ -79,7 +79,7 @@ public class SimpleOrderService {
 
         order.changeStateForce(state);
         // orderRepository.update(order);
-        OrderResponseDto orderREsponseDto = OrderResponseDto.toDto(order);
-        return orderREsponseDto;
+        OrderResponseDto orderResponseDto = OrderResponseDto.toDto(order);
+        return orderResponseDto;
     }
 }
