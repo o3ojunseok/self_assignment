@@ -1,6 +1,7 @@
 package kr.co.ordermanagement.presentation.controller;
 
 import kr.co.ordermanagement.application.SimpleOrderService;
+import kr.co.ordermanagement.presentation.dto.ChangeStateRequestDto;
 import kr.co.ordermanagement.presentation.dto.OrderProductRequestDto;
 import kr.co.ordermanagement.presentation.dto.OrderResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,17 @@ public class OrderController {
     }
 
     @GetMapping("/orders/{orderId}")
-        public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long orderId) {
-            OrderResponseDto orderResponseDto = simpleOrderService.findById(orderId);
-            return ResponseEntity.ok(orderResponseDto);
-        }
+    public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long orderId) {
+        OrderResponseDto orderResponseDto = simpleOrderService.findById(orderId);
+        return ResponseEntity.ok(orderResponseDto);
+    }
+
+    @PatchMapping("/orders/{orderId}")
+    public ResponseEntity<OrderResponseDto> changeOrderState(
+            @PathVariable Long orderId,
+            @RequestBody ChangeStateRequestDto changeStateRequestDto
+    ) {
+        OrderResponseDto orderResponseDto = simpleOrderService.changeState(orderId, changeStateRequestDto);
+        return ResponseEntity.ok(orderResponseDto);
+    }
 }

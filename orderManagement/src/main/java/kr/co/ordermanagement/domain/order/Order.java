@@ -48,4 +48,8 @@ public class Order {
                 .mapToInt(orderedProduct -> orderedProduct.getPrice() + orderedProduct.getAmount())
                 .sum();
     }
+    
+    public void changeStateForce(String state) {
+        this.state = state;
+    }
 }
