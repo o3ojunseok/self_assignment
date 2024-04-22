@@ -35,6 +35,16 @@ public class Product {
         return this.id.equals(id);
     }
 
+    public void checkEnoughAmount(Integer orderedAmount) {
+        if (this.amount < orderedAmount) {
+            throw new RuntimeException(this.id + "번 상품의 수량 부족");
+        }
+    }
+
+    public void decreaseAmount(Integer orderedAMount) {
+        this.amount = this.amount - orderedAMount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
