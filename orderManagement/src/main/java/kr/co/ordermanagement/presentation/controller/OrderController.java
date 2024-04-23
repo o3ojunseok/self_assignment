@@ -13,50 +13,55 @@ import java.util.List;
 
 @RestController
 public class OrderController {
+
     private SimpleOrderService simpleOrderService;
+
     @Autowired
     OrderController(SimpleOrderService simpleOrderService) {
         this.simpleOrderService = simpleOrderService;
     }
 
-    @PostMapping("/orders")
-    public ResponseEntity<OrderResponseDto> createOrder(
-            @RequestBody List<OrderProductRequestDto> orderProductRequestDtoList) {
-        OrderResponseDto orderResponseDto = simpleOrderService.createOrder(orderProductRequestDtoList);
+    // 상품 주문 API
+    @RequestMapping(value = "/orders", method = RequestMethod.POST)
+    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody List<OrderProductRequestDto> orderProductRequestDtos) {
+        OrderResponseDto orderResponseDto = simpleOrderService.createOrder(orderProductRequestDtos);
+
         return ResponseEntity.ok(orderResponseDto);
     }
 
-    @GetMapping("/orders/{orderId}")
+    // 주문번호로 조회 API
+    @RequestMapping(value = "/orders/{orderId}", method = RequestMethod.GET)
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long orderId) {
         OrderResponseDto orderResponseDto = simpleOrderService.findById(orderId);
+
         return ResponseEntity.ok(orderResponseDto);
     }
 
-    @PatchMapping("/orders/{orderId}")
+    // 주문상태 강제 변경 API
+    @RequestMapping(value = "/orders/{orderId}", method = RequestMethod.PATCH)
     public ResponseEntity<OrderResponseDto> changeOrderState(
             @PathVariable Long orderId,
             @RequestBody ChangeStateRequestDto changeStateRequestDto
     ) {
-        if (changeStateRequestDto.getState().equals("CREATED") ||
-        changeStateRequestDto.getState().equals("SHIPPING") ||
-        changeStateRequestDto.getState().equals("COMPLETED") ||
-        changeStateRequestDto.getState().equals("CANCELED")) {
-            OrderResponseDto orderResponseDto = simpleOrderService.changeState(orderId, changeStateRequestDto);
-            return ResponseEntity.ok(orderResponseDto);
-        } else {
-            throw new RuntimeException("존재하지 않는 상태");
-        }
+        OrderResponseDto orderResponseDto = simpleOrderService.changeState(orderId, changeStateRequestDto);
+
+        return ResponseEntity.ok(orderResponseDto);
     }
 
-    @GetMapping("/orders")
+    // 주문상태로 조회 API
+    @RequestMapping(value = "/orders", method = RequestMethod.GET)
     public ResponseEntity<List<OrderResponseDto>> getOrdersByState(@RequestParam State state) {
         List<OrderResponseDto> orderResponseDtos = simpleOrderService.findByState(state);
+
         return ResponseEntity.ok(orderResponseDtos);
     }
 
-    @PatchMapping("/orders/{orderId}/cancel")
+    // 주문 취소 API
+    @RequestMapping(value = "/orders/{orderId}/cancel", method = RequestMethod.PATCH)
     public ResponseEntity<OrderResponseDto> cancelOrderById(@PathVariable Long orderId) {
         OrderResponseDto orderResponseDto = simpleOrderService.cancelOrderById(orderId);
+
         return ResponseEntity.ok(orderResponseDto);
     }
+
 }

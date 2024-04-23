@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class ListOrderRepository implements OrderRepository {
+
     private List<Order> orders = new CopyOnWriteArrayList<>();
     private AtomicLong sequence = new AtomicLong(1L);
 
@@ -28,7 +29,7 @@ public class ListOrderRepository implements OrderRepository {
         return orders.stream()
                 .filter(order -> order.sameId(id))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Order 찾을 수 없음"));
+                .orElseThrow(() -> new EntityNotFoundException("Order를 찾지 못했습니다."));
     }
 
     @Override
@@ -37,4 +38,5 @@ public class ListOrderRepository implements OrderRepository {
                 .filter(order -> order.sameState(state))
                 .toList();
     }
+
 }
