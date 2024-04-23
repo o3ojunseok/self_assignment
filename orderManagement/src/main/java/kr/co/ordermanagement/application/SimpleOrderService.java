@@ -2,6 +2,7 @@ package kr.co.ordermanagement.application;
 
 import kr.co.ordermanagement.domain.order.Order;
 import kr.co.ordermanagement.domain.order.OrderRepository;
+import kr.co.ordermanagement.domain.order.OrderedProduct;
 import kr.co.ordermanagement.domain.order.State;
 import kr.co.ordermanagement.domain.product.Product;
 import kr.co.ordermanagement.domain.product.ProductRepository;
@@ -25,51 +26,20 @@ public class SimpleOrderService {
         this.orderRepository = orderRepository;
     }
 
-    public OrderResponseDto createOrder(List<OrderProductRequestDto> orderProductRequestDtoList) {
-        List<Product> orderProducts = makeOrderProducts(orderProductRequestDtoList);
-        decreaseProductsAmount(orderProducts);
+    public OrderResponseDto createOrder(List<OrderProductRequestDto> orderProductRequestDtos) {
+        List<OrderedProduct> orderedProducts = makeOrderedProducts(orderProductRequestDtos);
+        decreaseProductsAmount(orderedProducts);
 
-        Order order = new Order(orderProducts);
+        Order order = new Order(orderedProducts);
         orderRepository.add(order);
 
         OrderResponseDto orderResponseDto = OrderResponseDto.toDto(order);
         return orderResponseDto;
     }
 
-    private List<Product> makeOrderProducts(List<OrderProductRequestDto> orderProductRequestDtoList) {
-        return orderProductRequestDtoList
-                .stream()
-                .map(orderProductRequestDto -> {
-                    Long productId = orderProductRequestDto.getId();
-                    Product product = productRepository.findById(productId);
-
-                    Integer orderedAmount = orderProductRequestDto.getAmount();
-                    product.checkEnoughAmount(orderedAmount);
-
-                    return new Product(
-                            productId,
-                            product.getName(),
-                            product.getPrice(),
-                            orderProductRequestDto.getAmount()
-                    );
-                }).toList();
-    }
-
-    private void decreaseProductsAmount(List<Product> orderedProducts) {
-        orderedProducts
-                .forEach(orderedProduct ->  {
-                    Long productId = orderedProduct.getId();
-                    Product product = productRepository.findById(productId);
-
-                    Integer orderedAmount = orderedProduct.getAmount();
-                    product.decreaseAmount(orderedAmount);
-
-                    productRepository.update(product);
-                });
-    }
-
     public OrderResponseDto findById(Long orderId) {
         Order order = orderRepository.findById(orderId);
+
         OrderResponseDto orderResponseDto = OrderResponseDto.toDto(order);
         return orderResponseDto;
     }
@@ -79,7 +49,7 @@ public class SimpleOrderService {
         State state = changeStateRequestDto.getState();
 
         order.changeStateForce(state);
-        // orderRepository.update(order);
+
         OrderResponseDto orderResponseDto = OrderResponseDto.toDto(order);
         return orderResponseDto;
     }
@@ -89,16 +59,49 @@ public class SimpleOrderService {
 
         List<OrderResponseDto> orderResponseDtos = orders
                 .stream()
-                .map(OrderResponseDto::toDto)
+                .map(order -> OrderResponseDto.toDto(order))
                 .toList();
+
         return orderResponseDtos;
     }
+
     public OrderResponseDto cancelOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId);
 
         order.cancel();
-//        orderRepository.update(order);
+
         OrderResponseDto orderResponseDto = OrderResponseDto.toDto(order);
         return orderResponseDto;
+    }
+
+    private List<OrderedProduct> makeOrderedProducts(List<OrderProductRequestDto> orderProductRequestDtos) {
+        return orderProductRequestDtos
+                .stream()
+                .map(orderProductRequestDto -> {
+                    Long productId = orderProductRequestDto.getId();
+                    Product product = productRepository.findById(productId);
+
+                    Integer orderedAmount = orderProductRequestDto.getAmount();
+                    product.checkEnoughAmount(orderedAmount);
+
+                    return new OrderedProduct(
+                            productId,
+                            product.getName(),
+                            product.getPrice(),
+                            orderProductRequestDto.getAmount()
+                    );
+                }).toList();
+    }
+
+    private void decreaseProductsAmount(List<OrderedProduct> orderedProducts) {
+        orderedProducts
+                .stream()
+                .forEach(orderedProduct -> {
+                    Long productId = orderedProduct.getId();
+                    Product product = productRepository.findById(productId);
+
+                    Integer orderedAmount = orderedProduct.getAmount();
+                    product.decreaseAmount(orderedAmount);
+                });
     }
 }

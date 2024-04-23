@@ -1,27 +1,24 @@
 package kr.co.ordermanagement.domain.order;
 
-import kr.co.ordermanagement.domain.product.Product;
-
 import java.util.List;
 
 public class Order {
     private Long id;
-    private List<Product> orderedProducts;
+    private List<OrderedProduct> orderedProducts;
     private Integer totalPrice;
     private State state;
 
-    public Order(List<Product> orderedProducts) {
+    public Order(List<OrderedProduct> orderedProducts) {
         this.orderedProducts = orderedProducts;
         this.totalPrice = calculateTotalPrice(orderedProducts);
         this.state = State.CREATED;
     }
 
     public Long getId() {
-
         return id;
     }
 
-    public List<Product> getOrderedProducts() {
+    public List<OrderedProduct> getOrderedProducts() {
         return orderedProducts;
     }
 
@@ -41,21 +38,23 @@ public class Order {
         return this.id.equals(id);
     }
 
-    private Integer calculateTotalPrice(List<Product> orderedProcuts) {
-        return orderedProcuts
-                .stream()
-                .mapToInt(orderedProduct -> orderedProduct.getPrice() + orderedProduct.getAmount())
-                .sum();
+    public Boolean sameState(State state) {
+        return this.state.equals(state);
     }
 
     public void changeStateForce(State state) {
         this.state = state;
     }
-    public Boolean sameState(State state) {
-        return this.state.equals(state);
-    }
+
     public void cancel() {
         this.state.checkCancellable();
         this.state = State.CANCELED;
+    }
+
+    private Integer calculateTotalPrice(List<OrderedProduct> orderedProducts) {
+        return orderedProducts
+                .stream()
+                .mapToInt(orderedProduct -> orderedProduct.getPrice() * orderedProduct.getAmount())
+                .sum();
     }
 }
